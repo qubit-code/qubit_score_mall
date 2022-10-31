@@ -1,0 +1,73 @@
+{include file="$esa_header"}
+<div class="padding-md">
+    <ul class="breadcrumb">
+        <li>{$esa_addon.name}</li>	  
+        <li>商品管理列表</li>	  
+    </ul>
+    <div class="smart-widget">
+        <div id="table"></div>
+    </div>
+</div>
+<script id="headToolbar" type="text/html">
+    <div class="padding-sm">
+        <button class="btn btn-success btn-sm" esa-event="form">添加</button>
+        <button class="btn btn-info btn-sm" esa-event="reload"><i class="fa fa-refresh"></i></button>
+    </div>
+</script>
+<script id="tool" type="text/html">
+    <button class="btn btn-primary btn-xs" esa-event="form">编辑</button>
+    <button class="btn btn-danger btn-xs" esa-event="delete">删除</button>
+</script>
+<script>
+require(['ESA','esa_table','layer',"esa_switch"],function(ESA,Table,layer){
+    Table.init({
+        elem: "#table",
+        page: true,
+        cols: [
+            {field:"id",width:"50px",title:"ID"},
+            {field:"img",width:"150px",title:"图片",tpl:function(d){return '<img height="50px" src="'+d.img+'">';}},
+            {field:"title",width:"auto",title:"名称"},
+            {field:"numbers",width:"150px",title:"数量"},
+            {field:"integrals",width:"100px",title:"兑换积分数"},
+            // {field:"status",width:"100px",title:"状态",tpl:function(d){return d.status == 0 ? '下架' : '上架'}},
+            {field:"id",width:"100px",title:"上架状态",tpl:function(d){
+                return "<span class='switch-sm "+((d.status != 0) ? 'switch-on' : 'switch-off')+"' esa-event='chanage_status'><span class='slider'></span></span>";
+            }},
+            {field:"tool",width:"10%",title:"操作",toolbar:"#tool"}
+        ],
+        headToolbar:"#headToolbar",
+        limit: 5,
+    })
+    Table.on("#table",function(obj){
+        if(obj.event == "reload"){
+            Table.reload("#table");
+        }else if(obj.event == "form"){
+            ESA.fun.open("{:esaurl('admin.commodity/form')}","添加/编辑",{
+                data:{id:obj.data.id},
+                callback: function(){
+                    Table.reload("#table");
+                }
+            });
+        }else if(obj.event == "delete"){
+            ESA.fun.ajax({
+                url:"{:esaurl('admin.commodity/delete')}",
+                data:{id:obj.data.id}
+            },function(){
+                Table.reload("#table");
+            });
+        }else if(obj.event == "chanage_status"){
+            ESA.fun.ajax({
+                url:"{:esaurl('admin.commodity/chanage_status')}",
+                data:{id:obj.data.id}
+            },function(){
+                Table.reload("#table");
+            },function(){
+                Table.reload("#table");
+            });
+        }else{
+            ESA.msg("表格内事件触发");
+        }
+    })
+})
+</script>
+{include file="$esa_footer"}

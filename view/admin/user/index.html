@@ -1,0 +1,74 @@
+{include file="$esa_header"}
+<div class="padding-md">
+    <ul class="breadcrumb">
+        <li>{$esa_addon.name}</li>	  
+        <li>用户管理列表</li>	  
+    </ul>
+    <div class="smart-widget">
+        <div id="table"></div>
+    </div>
+</div>
+<script id="headToolbar" type="text/html">
+    <div class="padding-sm">
+        <button class="btn btn-info btn-sm" esa-event="reload"><i class="fa fa-refresh"></i></button>
+    </div>
+</script>
+<script id="tool" type="text/html">
+    <%if (status == 0) { %>
+        <button class="btn btn-danger btn-xs" esa-event="blacklist">拉黑</button>
+    <% }else{ %>
+        <button class="btn btn-primary btn-xs" esa-event="disblacklist">取消黑名单</button>
+    <% } %>
+</script>
+<script>
+require(['ESA','esa_table','layer',"esa_switch"],function(ESA,Table,layer){
+    Table.init({
+        elem: "#table",
+        select: "checkbox",
+        page: true,
+        cols: [
+            {field:"id",width:"50px",title:"ID"},
+            {field:"user_id",width:"70px",title:"会员ID"},
+            {field:"avatar",width:"70px",title:"头像",tpl:function(d){return '<img height="50px" src="'+d.avatar+'">';}},
+            {field:"nickname",width:"auto",title:"昵称"},
+            {field:"user.score",width:"50px",title:"积分"},
+            {field:"create_time",width:"150px",title:"加入时间"},
+            {field:"tool",width:"10%",title:"操作",toolbar:"#tool"}
+        ],
+        headToolbar:"#headToolbar",
+        limit: 5,
+    })
+    Table.on("#table",function(obj){
+        if(obj.event == "reload"){
+            Table.reload("#table");
+        }else if(obj.event == "blacklist"){
+            layer.confirm('此用户将不能用商城部分功能！', {
+                title: "确定将此用户拉入黑名单？",
+                btn: ['确定','取消'] //按钮
+            }, function(index){
+                ESA.fun.ajax({
+                    url:"{:esaurl('admin.user/blacklist')}",
+                    data:{id:obj.data.id,status:1}
+                },function(){
+                    layer.close(index);
+                    Table.reload("#table");
+                });
+            })
+        }else if(obj.event == "disblacklist"){
+            layer.confirm('此用户将可使用商城所有功能！', {
+                title: "确定将此用户取消黑名单？",
+                btn: ['确定','取消'] //按钮
+            }, function(index){
+                ESA.fun.ajax({
+                    url:"{:esaurl('admin.user/blacklist')}",
+                    data:{id:obj.data.id,status:0}
+                },function(){
+                    layer.close(index);
+                    Table.reload("#table");
+                });
+            })
+        }
+    })
+})
+</script>
+{include file="$esa_footer"}

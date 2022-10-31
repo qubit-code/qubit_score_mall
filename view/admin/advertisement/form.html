@@ -1,0 +1,45 @@
+{include file="$esa_header"}
+<form class="form-horizontal no-margin padding-md form-add" method="POST" data-parsley-validate>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">标题</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" name="title" value="{$info.title|default=''}">
+        </div><!-- /.col -->
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">图片</label>
+        <div class="col-sm-10">
+            {ESA:FILE name="img" type="esa_upload,chose_file" mimetype="image/*" multiple="false" maxsize="10MB" value="$info.img|default=''"}
+            <span class="help-block">广告图片大小为640*710以内。</span>
+        </div><!-- /.col -->
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">链接</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" name="url" value="{$info.url|default=''}">
+            <span class="help-block">以https://或http://开头。</span>
+        </div><!-- /.col -->
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <input type="hidden" name="id" value="{$info.id|default=''}">
+            {:token()}
+        </div><!-- /.col -->
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-10">
+            <button type="submit" class="btn btn-success btn-embossed">确定</button>
+            <button type="button" class="btn btn-defalt btn-embossed layer-close">取消</button>
+        </div>
+    </div>
+</form>
+<script>
+    require(['esa_form'],function(form,esa){
+        function confirmCallback(){
+            ESA.clog("弹窗确认回调");
+        }
+        form.init($(".form-add"),confirmCallback())
+    })
+</script>
+{include file="$esa_footer"}

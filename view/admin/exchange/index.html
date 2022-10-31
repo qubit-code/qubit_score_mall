@@ -1,0 +1,107 @@
+{include file="$esa_header"}
+<div class="padding-md">
+    <ul class="breadcrumb">
+        <li>{$esa_addon.name}</li>	  
+        <li>积分兑换管理列表</li>	  
+    </ul>
+    <div class="smart-widget">
+        <div id="table"></div>
+    </div>
+</div>
+<script id="headToolbar" type="text/html">
+    <div class="padding-sm">
+        <button class="btn btn-success btn-sm" esa-event="exchanges">批量核销</button>
+        <button class="btn btn-info btn-sm" esa-event="reload"><i class="fa fa-refresh"></i></button>
+    </div>
+</script>
+<script id="tool" type="text/html">
+    <%if (consume_time == 0) { %>
+    <button class="btn btn-primary btn-xs" esa-event="exchange">核销</button>
+    <button class="btn btn-danger btn-xs" esa-event="delete">删除</button>
+    <% }else{ %>
+    <!-- <button class="btn btn-success btn-xs" esa-event="mark">备注</button> -->
+    <% } %>
+</script>
+<script>
+require(['ESA','esa_table','layer',"esa_switch"],function(ESA,Table,layer){
+    Table.init({
+        elem: "#table",
+        select: "checkbox",
+        page: true,
+        cols: [
+            {field:"id",width:"50px",title:"ID"},
+            {field:"commodity_title",width:"150px",title:"商品名称"},
+            {field:"commodity_integrals",width:"70px",title:"商品积分"},
+            {field:"avatar",width:"100px",title:"兑换人头像",tpl:function(d){return '<img height="50px" src="'+d.avatar+'">';}},
+            {field:"name",width:"auto",title:"兑换人姓名"},
+            {field:"tel",width:"100px",title:"兑换人手机号"},
+            {field:"addr",width:"auto",title:"兑换人地址"},
+            {field:"create_time",width:"150px",title:"兑换时间"},
+            {field:"consume_time_true",width:"150px",title:"核销时间"},
+            {field:"consume_time",width:"100px",title:"状态",tpl:function(d){return d.consume_time == 0 ? '未核销' : '已核销'}},
+            {field:"tool",width:"10%",title:"操作",toolbar:"#tool"}
+        ],
+        headToolbar:"#headToolbar",
+        limit: 8,
+    })
+    Table.on("#table",function(obj){
+        if(obj.event == "reload"){
+            Table.reload("#table");
+        }else if(obj.event == "exchange"){
+            layer.confirm('确定核销当前数据？', {
+                title: "核销提示",
+                btn: ['确定','取消'] //按钮
+            }, function(index){
+                ESA.fun.ajax({
+                    url:"{:esaurl('admin.exchange/exchange')}",
+                    data:{ids:obj.data.id},
+                },function(){
+                    layer.close(index);
+                    Table.reload("#table");
+                })
+            });
+        }else if(obj.event == "exchanges"){
+            layer.confirm('确定核销已选的'+obj.ids.length+'个数据？', {
+                title: "批量核销提示",
+                btn: ['确定','取消'] //按钮
+            }, function(index){
+                ESA.fun.ajax({
+                    url:"{:esaurl('admin.exchange/exchange')}",
+                    data:{ids:obj.ids},
+                },function(){
+                    layer.close(index);
+                    Table.reload("#table");
+                })
+            });
+        }else if(obj.event == "delete"){
+            layer.confirm('确定删除此兑换数据？', {
+                title: "删除提示",
+                btn: ['保留库存','直接删除'] //按钮
+            }, function(index){
+                ESA.fun.ajax({
+                    url:"{:esaurl('admin.exchange/delete')}",
+                    data:{id:obj.data.id,keep:"yes"},
+                },function(){
+                    layer.close(index);
+                    Table.reload("#table");
+                })
+            }, function(index){
+                ESA.fun.ajax({
+                    url:"{:esaurl('admin.exchange/delete')}",
+                    data:{id:obj.data.id,keep:"no"},
+                },function(){
+                    layer.close(index);
+                    Table.reload("#table");
+                })
+            });
+            // ESA.fun.ajax({
+            //     url:"{:esaurl('admin.exchange/delete')}",
+            //     data:{id:obj.data.id}
+            // },function(){
+            //     Table.reload("#table");
+            // });
+        }
+    })
+})
+</script>
+{include file="$esa_footer"}

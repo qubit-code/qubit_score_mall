@@ -1,0 +1,51 @@
+{include file="common/header"}
+<div class="container">
+    <div class="row bg-info" style="height:14rem;"></div>
+    <div class="row col-lg-12">
+        <div class="user-widget" style="margin-top:-12rem">
+        	<div class="user-widget-body bg-grey">
+        		<img src="{:attach2url($esa_user->avatar)}" alt="">
+        		<div class="user-detail">
+        			<div class="m-top-sm">{$esa_user->nickname}</div>
+        			<div class="small-text">UID:{$esa_user->id}</div>
+        		</div>
+        	</div>
+        	<div class="user-widget-statatistic">
+        		<ul class="clearfix">
+        			<li class="border-red">
+        				<div class="text-muted text-upper font-sm">分享得积分</div>
+        				{$fans.share_num|default=0}
+        			</li>
+        			<li class="border-green">
+        				<div class="text-muted text-upper font-sm">分享次数</div>
+        				{$fans.share_count|default=0}
+        			</li>
+        			<li class="border-yellow">
+        				<div class="text-muted text-upper font-sm">积分</div>
+        				{$esa_user->score}
+        			</li>
+        		</ul><!-- ./row -->
+        	</div>
+        </div>
+        <div class="list-group">
+			<a class="list-group-item" id="about">
+				<i class="fa fa-paper-plane fa-lg"></i>
+				<span class="m-left-xs">关于</span>
+				<!--<span class="badge badge-info">7</span>-->
+			</a>
+		</div>
+    </div>
+</div>
+<script>
+    require(['jquery','layer'],function($,layer){
+        $("#about").on("click",function(){
+            layer.alert('{$config.basics.about|default=""|raw}<div class="text-center">技术支持：<a href="https://www.esaadmin.com/">昆比特科技</a></div>', {
+                title: "关于",
+                skin: 'layui-layer-lan',
+                closeBtn: 0,
+                anim: 4,
+            });
+        })
+    })
+</script>
+{include file="common/footer"}

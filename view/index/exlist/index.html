@@ -1,0 +1,22 @@
+{include file="common/header"}
+<div class="container padding" style="margin-top:10px">
+    {if !$list}
+    <p style="text-align: center;line-height: 60px;font-size: 18px;">暂时无兑奖记录！</p>
+    {else}
+    {volist name="$list" id="row"}
+    <div class="widget-stat clearfix" style="margin-bottom:10px">
+        <a href="#">
+            <span class="stat-icon bounceIn animation-delay3"><img src="{$row.commodity_img|attach2url}"></span>
+            <div class="stat-info">
+                <font class="pull-right">{if $row['consume_time']==0}待审核{else}已兑奖{/if}</font>
+                <span>{$row['commodity_title']}</span>
+                <small class="text-muted text-upper">领取时间：{$row.create_time|date='Y-m-d H:i:s'}</small>
+                <br>
+                <small class="text-muted text-upper">{if $row['consume_time']!=0}核销时间：{$row.consume_time|date='Y-m-d H:i:s'}{/if}</small>
+            </div>
+        </a>
+    </div>
+    {/volist}
+    {/if}
+</div>
+{include file="common/footer"}

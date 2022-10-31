@@ -1,0 +1,57 @@
+	<!-- 底部导航 -->
+    <footer class="footer">
+        <ul class="nav nav-tabs nav-tabs-justified">
+            <div class="row" align="center">
+                <a href="{:esaurl('index.index/index')}">
+                    <div class="col-md-4 col-sm-4 col-xs-4 {if $controller == 'index/index'}text-info{/if}" align="center">
+                        <i class="fa fa-home fa-2x"></i>
+                        <li>首页</li>
+                    </div>
+                </a>
+                <a href="{:esaurl('index.exlist/index')}">
+                    <div class="col-md-4 col-sm-4 col-xs-4 {if $controller == 'index/exlist'}text-info{/if}" align="center">
+                        <i class="fa fa-list-alt fa-2x"></i>
+                        <li>兑换记录</li>
+                    </div>
+                </a>
+                <a href="{:esaurl('index.user/index')}">
+                    <div class="col-md-4 col-sm-4 col-xs-4 {if $controller == 'index/user'}text-info{/if}" align="center">
+                        <i class="fa fa-user-circle-o fa-2x"></i>
+                        <li>个人中心</li>
+                    </div>
+                </a>
+            </div>
+        </ul>
+    </footer>
+	<a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+</div>
+{if is_wechat()}
+{$wxjssdk|default=''|raw}
+<script>
+    require(['wx_jssdk'],function(wx){
+        require(['wx_jssdk'],function(wx){
+        wx.ready(function () {
+            var config = {
+                title: '{$config.share.title|default="积分商城"}',
+                desc: '{$config.share.desc|default="积分商城"}',
+                link: '{:esaurl("index.index/index",["ecode"=>base64_encode("qubit_score_mall_".$esa_user->id)],"html",true)}',
+                imgUrl: '{$config.share.image|default=''|attach2url}', // 分享图标
+            }
+            // 分享到好友
+            wx.updateAppMessageShareData(config);
+            // 分享到朋友圈
+            wx.updateTimelineShareData(config);
+            // 隐藏掉所有能隐藏的按钮
+            wx.hideAllNonBaseMenuItem();
+            // 显示要显示的按钮
+            wx.showMenuItems({
+                menuList: ["menuItem:share:appMessage","menuItem:share:timeline","menuItem:favorite"]
+            });
+        });
+        
+    })
+        
+    })
+</script>
+{/if}
+{include file="$esa_footer"}

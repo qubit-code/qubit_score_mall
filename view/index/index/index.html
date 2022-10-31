@@ -1,0 +1,126 @@
+{include file="common/header"}
+<div class="swiper-container">
+    <div class="swiper-wrapper">
+        {volist name="$ad_list" id="item"}
+        <div class="swiper-slide">
+            <a href="{$item.url|default=''}">
+                <img src="{$item['img']|default=''|attach2url}" width="100%">
+            </a>
+        </div>
+        {/volist}
+    </div>
+    <!-- 如果需要分页器 -->
+    <div class="swiper-pagination"></div>
+</div>
+<script>
+    require(['jquery','swiper'],function($,Swiper){
+        var mySwiper = new Swiper ('.swiper-container', {
+            effect: "fade",
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            loop: true, // 循环模式选项
+            // 如果需要分页器
+            pagination: {
+                el: '.swiper-pagination',
+            },
+        })
+    })
+</script>
+<div class="container padding" style="">
+	{volist name="$list" id="row"}
+	<div class="col-xs-6 text-center padding-sm">
+		<a href="{$row.url|default='#'}" class="commodity_image" style="display:block;height:25vh">
+            <img src="{$row.img|default=''|attach2url}" class="img-thumbnail" width="100%" style="max-height:25vh">
+		</a>
+		<span style="color: #606060;">{$row.title|default=''}</span>
+		<div class="commodity_num" data-id="{$row.id}" data-num="{$row.numbers|default=0}">数量： {$row.numbers|default=0}</div>
+		<div>积分：{$row.integrals|default=0}</div>
+		<div class="btn btn-default btn-sm btn-block exchange" style="background-color:#075692;color: #d2e6e9;" data-int="{$row.integrals|default=0}" data-title="{$row.title|default=''}" data-id="{$row.id}">兑换</div>
+	</div>
+	{/volist}
+	<style>
+	    .commodity_image {
+            display: table-cell;vertical-align: middle;
+        }
+	</style>
+</div>
+<script id="user_info" type="text/html">
+    <div class="form padding-sm">
+        <div class="form-group">
+    		<label for="exampleInputEmail1">姓名</label>
+    		<input type="text" class="form-control" id="name" placeholder="其输入姓名" value="{$fans.name|default=''}">
+    	</div>
+    	<div class="form-group">
+    		<label for="exampleInputEmail1">电话</label>
+    		<input type="number" class="form-control" id="tel" placeholder="请输入电话号" value="{$fans.tel|default=''}">
+    	</div>
+    	<div class="form-group">
+    		<label for="exampleInputEmail1">地址</label>
+    		<input type="text" class="form-control" id="addr" placeholder="请输入联系地址" value="{$fans.addr|default=''}">
+    	</div>
+    </div>
+</script>
+<script>
+    require(['jquery','layer','jquery.cookie'],function($,layer){
+        $(".exchange").on("click",function(){
+            let int = $(this).data("int");
+            let title = $(this).data("title");
+            let id = $(this).data("id");
+            layer.confirm('您确定花'+int+'积分兑换'+title+'吗!', {
+                title: "提示",
+                btn: ['确定','取消'] //按钮
+            }, function(index){
+                layer.open({
+                    type: 1,
+                    title:'联系方式填写',
+                    // skin:'layui-layer-rim',
+                    area:['90%', 'auto'],
+                    content: $("#user_info").html(),
+                    btn:['确定','取消'],
+                    btn1: function (index,layero) {
+                        let name = $("#name").val();
+                        let tel = $("#tel").val();
+                        let addr = $("#addr").val();
+                        ESA.fun.ajax({
+                            url: "{:esaurl('index.index/get')}",
+                            data: {id:id,name:name,tel:tel,addr:addr}
+                        },function(data,res){
+                            let num = $(".commodity_num[data-id='"+id+"']").data("num");
+                            $(".commodity_num[data-id='"+id+"']").text("数量："+(num-1));
+                            $(".commodity_num[data-id='"+id+"']").data("num",num-1);
+                            layer.close(index)
+                        },function(data,res){
+                            layer.close(index)
+                        })
+                    },
+                })
+                layer.close(index)
+                
+            });
+            
+        })
+        function ad(){
+            if($.cookie("alert") == "true"){
+                return ;
+            }
+            var index = layer.msg('<a href="{$config.basics.top_ad_href|default=""}"><img src="{$config.basics.top_ad_image|default=''|attach2url}"></a>', {
+                shade:[0.6,'#000'],
+                time:0,
+                btn: ['关闭'],
+                btnAlign: 'c',
+                yes:function(index){
+                    $.cookie("alert",true);
+                    layer.close(index)
+                }
+            });
+            layer.style(index, {
+                'left'  : "0px",
+                'background-color': "rgba(119,136,153,0)"
+            });
+        }
+        ad();
+    })
+</script>
+{include file="common/footer"}
